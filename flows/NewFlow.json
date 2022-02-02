@@ -1,0 +1,231 @@
+{
+	"schemaVersion": "4",
+	"info": {
+		"name": "Approval Flow",
+		"description": ""
+	},
+	"parameter": {
+		"properties": {
+			"request": {
+				"description": "The request"
+			},
+			"config": {
+				"type": "object",
+				"description": "The service's configuration"
+			},
+			"env": {
+				"type": "object",
+				"description": "The host OS environment"
+			}
+		},
+		"additionalProperties": false
+	},
+	"start": "javascript.1",
+	"nodes": {
+		"ucswagger.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-swagger/ucswagger",
+			"name": "checkSubscriptionRequests",
+			"method": "GET_subscriptions",
+			"parameters": [
+				{
+					"name": "query",
+					"type": "string",
+					"value": "\"state==REQUESTED\"",
+					"metaName": "query",
+					"metaDescription": "Query string for filtering entity. Expressed in FIQL/RSQL language.\nAllowed fields for filtering:\n        name\n        state\n        owningTeamId\n        deletable\n        metadata.createTimestamp\n        audit.createTimestamp (same as metadata.createTimestamp)\n        metadata.modifyTimestamp\n        audit.modifyTimestamp (same as metadata.modifyTimestamp)\n        catalogItemId\n        relationships.type\n        relationships.value\nDocumentation link to help with multiple values for query: https://github.com/jirutka/rsql-parser"
+				}
+			],
+			"outputs": {
+				"200": {
+					"routes": [
+						"invoke-flow.1"
+					],
+					"context": "$.checkSubscriptionRequests.response",
+					"metaName": "200"
+				},
+				"400": {
+					"routes": [],
+					"context": "$.checkSubscriptionRequests.response",
+					"metaName": "400"
+				},
+				"401": {
+					"routes": [],
+					"context": "$.checkSubscriptionRequests.response",
+					"metaName": "401"
+				},
+				"500": {
+					"routes": [],
+					"context": "$.checkSubscriptionRequests.response",
+					"metaName": "500"
+				},
+				"error": {
+					"routes": [],
+					"context": "$.checkSubscriptionRequests.error",
+					"metaName": "Error"
+				},
+				"default": {
+					"routes": [],
+					"context": "$.checkSubscriptionRequests.response",
+					"metaName": "Default"
+				}
+			},
+			"metaMethod": "GET_subscriptions",
+			"authorizations": [
+				{
+					"name": "OAuth2ClientCredentials",
+					"type": "credential",
+					"value": "Amplify Unified Catalog APIs OAuth2ClientCredentials_clientCredentials"
+				}
+			]
+		},
+		"invoke-flow.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-invoke-flow/invoke-flow",
+			"name": "checkSubscriptions",
+			"method": "invokeFlowForEach",
+			"parameters": [
+				{
+					"name": "items",
+					"type": "jsonpath",
+					"value": "$.checkSubscriptionRequests.response.data",
+					"metaName": "Items",
+					"metaDescription": "An array of input items where each item will be passed as request data when invoking the flow."
+				},
+				{
+					"name": "id",
+					"type": "string",
+					"value": "\"subscriptionsChecker\""
+				}
+			],
+			"outputs": {
+				"next": {
+					"routes": [],
+					"context": "$.response",
+					"metaName": "Next"
+				},
+				"error": {
+					"routes": [],
+					"context": "$.error",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Invoke Flow (for-each)"
+		},
+		"javascript.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "prepareGetSfdcAccessToken",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"let url = 'https://'+data.env.SFDC_DOMAIN_NAME+'.my.salesforce.com'+'/services/oauth2/token';\\n  let headers = {\\n    'Content-Type': 'application/x-www-form-urlencoded'\\n  };\\n  let body = {\\n    'grant_type': 'password',\\n    'client_id': data.env.SFDC_CLIENT_ID,\\n    'client_secret': data.env.SFDC_CLIENT_SECRET,\\n    'username': data.env.SFDC_USERNAME,\\n    'password': data.env.SFDC_PASSWORD+data.env.SFDC_SECRET\\n  };\\n  \\n  return {url, headers, body};\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.prepareGetSfdcAccessToken.result",
+					"routes": [
+						"rest.1"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.prepareGetSfdcAccessToken.error",
+					"routes": [],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"rest.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-restclient/rest",
+			"name": "getSfdcToken",
+			"method": "post",
+			"parameters": [
+				{
+					"name": "body",
+					"type": "jsonpath",
+					"value": "$.prepareGetSfdcAccessToken.result.body",
+					"metaName": "Body",
+					"metaDescription": "The content to send."
+				},
+				{
+					"name": "url",
+					"type": "jsonpath",
+					"value": "$.prepareGetSfdcAccessToken.result.url",
+					"metaName": "URL",
+					"metaDescription": "The target URL."
+				},
+				{
+					"name": "headers",
+					"type": "jsonpath",
+					"value": "$.prepareGetSfdcAccessToken.result.headers",
+					"metaName": "Headers",
+					"metaDescription": "The HTTP headers to set."
+				}
+			],
+			"outputs": {
+				"2xx": {
+					"routes": [
+						"setcontext.1"
+					],
+					"context": "$.getSfdcToken.response",
+					"metaName": "2XX"
+				},
+				"3xx": {
+					"routes": [],
+					"context": "$.getSfdcToken.response",
+					"metaName": "3XX"
+				},
+				"4xx": {
+					"routes": [],
+					"context": "$.getSfdcToken.response",
+					"metaName": "4XX"
+				},
+				"5xx": {
+					"routes": [],
+					"context": "$.getSfdcToken.response",
+					"metaName": "5XX"
+				},
+				"error": {
+					"routes": [],
+					"context": "$.getSfdcToken.error",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "POST"
+		},
+		"setcontext.1": {
+			"type": "nodehandler://axway-flow/setcontext",
+			"name": "Set Context",
+			"method": "setcontext",
+			"parameters": [
+				{
+					"name": "value",
+					"type": "jsonpath",
+					"value": "$.getSfdcToken.response.body.access_token",
+					"metaName": "Value"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.config.sfdcAccessToken",
+					"routes": [
+						"ucswagger.1"
+					],
+					"metaName": "Next"
+				}
+			},
+			"metaMethod": "Set Context"
+		}
+	}
+}

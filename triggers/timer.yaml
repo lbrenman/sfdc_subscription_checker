@@ -1,0 +1,11 @@
+triggers:
+  timer-1:
+    name: Timer
+    parameters:
+      interval: $.env.INTERVAL
+    enabled: true
+    invoke:
+      flow: NewFlow
+      parameters:
+        config: $.config
+        env: $.env

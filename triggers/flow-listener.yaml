@@ -1,0 +1,12 @@
+triggers:
+  flow-listener-1:
+    name: Flow Listener
+    parameters:
+      id: subscriptionsChecker
+    enabled: true
+    invoke:
+      flow: NewFlow1
+      parameters:
+        request: $.request
+        config: $.config
+        env: $.env

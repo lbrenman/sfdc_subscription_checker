@@ -1,0 +1,949 @@
+{
+	"schemaVersion": "4",
+	"info": {
+		"name": "Subscriptions Checker",
+		"description": ""
+	},
+	"parameter": {
+		"properties": {
+			"request": {
+				"description": "The request"
+			},
+			"config": {
+				"type": "object",
+				"description": "The service's configuration"
+			},
+			"env": {
+				"type": "object",
+				"description": "The host OS environment"
+			}
+		},
+		"additionalProperties": false
+	},
+	"start": "ucswagger.1",
+	"nodes": {
+		"invoke-flow-response.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-invoke-flow/invoke-flow-response",
+			"name": "Set Response",
+			"method": "setResponse",
+			"parameters": [
+				{
+					"name": "isError",
+					"type": "boolean",
+					"value": "false",
+					"metaName": "Is Error",
+					"metaDescription": "Indicates that the response is an error.  This will cause the `Invoke Flow` to trigger the `Error` output with this value."
+				},
+				{
+					"name": "data",
+					"type": "string",
+					"value": "\"Success\"",
+					"metaName": "Data",
+					"metaDescription": "The result to be returned to the flow that called `Invoke Flow`."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Set Response"
+		},
+		"invoke-flow-response.2": {
+			"type": "nodehandler://@axway/api-builder-plugin-invoke-flow/invoke-flow-response",
+			"name": "Set Response",
+			"method": "setResponse",
+			"parameters": [
+				{
+					"name": "isError",
+					"type": "boolean",
+					"value": "false",
+					"metaName": "Is Error",
+					"metaDescription": "Indicates that the response is an error.  This will cause the `Invoke Flow` to trigger the `Error` output with this value."
+				},
+				{
+					"name": "data",
+					"type": "string",
+					"value": "\"Success\"",
+					"metaName": "Data",
+					"metaDescription": "The result to be returned to the flow that called `Invoke Flow`."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Set Response"
+		},
+		"ucswagger.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-swagger/ucswagger",
+			"name": "getCatalogItem",
+			"method": "GET_CatalogItem",
+			"parameters": [
+				{
+					"name": "catalogItemId",
+					"type": "jsonpath",
+					"value": "$.request.catalogItemId",
+					"metaName": "catalogItemId"
+				}
+			],
+			"outputs": {
+				"200": {
+					"routes": [
+						"authz.1"
+					],
+					"context": "$.getCatalogItem.response",
+					"metaName": "200"
+				},
+				"400": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getCatalogItem.response",
+					"metaName": "400"
+				},
+				"401": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getCatalogItem.response",
+					"metaName": "401"
+				},
+				"403": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getCatalogItem.response",
+					"metaName": "403"
+				},
+				"404": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getCatalogItem.response",
+					"metaName": "404"
+				},
+				"500": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getCatalogItem.response",
+					"metaName": "500"
+				},
+				"error": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getCatalogItem.error",
+					"metaName": "Error"
+				},
+				"default": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getCatalogItem.response",
+					"metaName": "Default"
+				}
+			},
+			"authorizations": [
+				{
+					"name": "OAuth2ClientCredentials",
+					"type": "credential",
+					"value": "Amplify Unified Catalog APIs OAuth2ClientCredentials_clientCredentials"
+				}
+			],
+			"metaMethod": "GET_CatalogItem"
+		},
+		"javascript.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "prepareGetContactByEmail",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"//console.log('EMAIL TO CHECK');\\n  //console.log(data.getUser\\t.response.body.result.email);\\n  \\n  let url = 'https://'+data.env.SFDC_DOMAIN_NAME+'.my.salesforce.com'+'/services/data/v53.0/query?q=SELECT+id+from+contact+where+email+%3d+%27'+data.getUser.response.body.result.email+'%27';\\n  let headers = {\\n    'Authorization': 'Bearer '+data.config.sfdcAccessToken\\n  };\\n  \\n  return {url, headers};\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.prepareGetContactByEmail.result",
+					"routes": [
+						"rest.2"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.prepareGetContactByEmail.error",
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"rest.2": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-restclient/rest",
+			"name": "getContactByEmail",
+			"method": "get",
+			"parameters": [
+				{
+					"name": "url",
+					"type": "jsonpath",
+					"value": "$.prepareGetContactByEmail.result.url",
+					"metaName": "URL",
+					"metaDescription": "The target URL."
+				},
+				{
+					"name": "headers",
+					"type": "jsonpath",
+					"value": "$.prepareGetContactByEmail.result.headers",
+					"metaName": "Headers",
+					"metaDescription": "The HTTP headers to set."
+				}
+			],
+			"outputs": {
+				"2xx": {
+					"routes": [
+						"javascript.3"
+					],
+					"context": "$.getContactByEmail.response",
+					"metaName": "2XX"
+				},
+				"3xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getContactByEmail.response",
+					"metaName": "3XX"
+				},
+				"4xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getContactByEmail.response",
+					"metaName": "4XX"
+				},
+				"5xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getContactByEmail.response",
+					"metaName": "5XX"
+				},
+				"error": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getContactByEmail.error",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "GET"
+		},
+		"javascript.2": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "prepareGetUser",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"//console.log(data.request.metadata.createUserId);\\n  //console.log(data.credential);\\n  \\n  let url = 'https://platform.axway.com/api/v1/user/'+data.request.metadata.createUserId;\\n  let headers = {\\n    Authorization: 'Bearer '+data.credential\\n  };\\n  \\n  return {url, headers};\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.prepareGetUser.result",
+					"routes": [
+						"rest.3"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.prepareGetUser.error",
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"rest.3": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-restclient/rest",
+			"name": "getUser",
+			"method": "get",
+			"parameters": [
+				{
+					"name": "url",
+					"type": "jsonpath",
+					"value": "$.prepareGetUser.result.url",
+					"metaName": "URL",
+					"metaDescription": "The target URL."
+				},
+				{
+					"name": "headers",
+					"type": "jsonpath",
+					"value": "$.prepareGetUser.result.headers",
+					"metaName": "Headers",
+					"metaDescription": "The HTTP headers to set."
+				}
+			],
+			"outputs": {
+				"2xx": {
+					"routes": [
+						"javascript.1"
+					],
+					"context": "$.getUser.response",
+					"metaName": "2XX"
+				},
+				"3xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getUser.response",
+					"metaName": "3XX"
+				},
+				"4xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getUser.response",
+					"metaName": "4XX"
+				},
+				"5xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getUser.response",
+					"metaName": "5XX"
+				},
+				"error": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.getUser.error",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "GET"
+		},
+		"authz.1": {
+			"type": "nodehandler://axway-flow-authorization/authz",
+			"name": "Get Credential",
+			"method": "getCredential",
+			"parameters": [
+				{
+					"name": "name",
+					"type": "string",
+					"value": "\"Amplify Unified Catalog APIs OAuth2ClientCredentials_clientCredentials\"",
+					"metaName": "Name",
+					"metaDescription": "The name of the configured credential to find and return."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.credential",
+					"routes": [
+						"javascript.2"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Get Credential"
+		},
+		"javascript.3": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "contactExistsOrIsWhitelisted",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"let contactExists = data.getContactByEmail.response.body.records.length>0;\\n  \\n  //console.log(data.getUser.response.body.result.email);\\n  //console.log(data.env.WHITELIST);\\n  //console.log(data.env.WHITELIST.includes(data.getUser.response.body.result.email.split('@')[1]));\\n  \\n  let isWhitelisted = data.env.WHITELIST.includes(data.getUser.response.body.result.email.split('@')[1]);\\n  \\n  //console.log('contactExists = '+contactExists);\\n  //console.log('isWhitelisted = '+isWhitelisted);\\n\\n  return contactExists || isWhitelisted;\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.contactExistsOrIsWhitelisted.result",
+					"routes": [
+						"condition.1"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.contactExistsOrIsWhitelisted.error",
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"condition.1": {
+			"type": "nodehandler://axway-flow/condition",
+			"name": "Equals",
+			"method": "equals",
+			"parameters": [
+				{
+					"name": "source",
+					"type": "jsonpath",
+					"value": "$.contactExistsOrIsWhitelisted.result",
+					"metaName": "Source",
+					"metaDescription": "The input to test."
+				},
+				{
+					"name": "value",
+					"type": "boolean",
+					"value": "true",
+					"metaName": "Value",
+					"metaDescription": "The value to test input against."
+				}
+			],
+			"outputs": {
+				"true": {
+					"routes": [
+						"javascript.5"
+					],
+					"context": "$.equals",
+					"metaName": "True"
+				},
+				"false": {
+					"routes": [
+						"javascript.4"
+					],
+					"context": "$.equals",
+					"metaName": "False"
+				}
+			},
+			"metaMethod": "Equals"
+		},
+		"javascript.4": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "prepareSendNotification",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"let url = data.env.MS_TEAMS_WEBHOOK_URL;\\n  \\n  let apicentralUrl = data.env.API_CENTRAL_URL ? data.env.API_CENTRAL_URL : 'https://apicentral.axway.com';\\n  let subscriptionUrl = apicentralUrl+'/catalog/'+data.request.catalogItemId+'/subscriptions/'+data.request.id;\\n  \\n  /*\\n  let body = {\\n    Text: 'API Subscription is being requested'\\n  };\\n  */\\n  \\n   let body = {\\n      \\\"@type\\\": \\\"MessageCard\\\",\\n      \\\"@context\\\": \\\"http://schema.org/extensions\\\",\\n      \\\"themeColor\\\": \\\"0076D7\\\",\\n      \\\"summary\\\": \\\"API Subscription Request\\\",\\n      \\\"sections\\\": [{\\n          \\\"activityTitle\\\": \\\"[\\\"+data.request.name+\\\"](\\\"+subscriptionUrl+\\\")\\\",\\n          \\\"activitySubtitle\\\": \\\"API: \\\"+data.getCatalogItem.response.data.name,\\n          \\\"facts\\\": [{\\n              \\\"name\\\": \\\"Name:\\\",\\n              \\\"value\\\": data.getUser.response.body.result.firstname + ' ' + data.getUser.response.body.result.lastname\\n          },{\\n              \\\"name\\\": \\\"Email:\\\",\\n              \\\"value\\\": data.getUser.response.body.result.email\\n          }],\\n          \\\"text\\\": \\\"API subscriber not found in Salesforce Contacts. Please add the following subscriber to [Salesforce](https://www.salesforce.com) and the API subscription request will be approved.\\\",\\n          \\\"markdown\\\": true\\n      }],\\n      \\\"potentialAction\\\": [\\n        {\\n              \\\"@type\\\": \\\"OpenUri\\\",\\n              \\\"name\\\": \\\"View Subscription\\\",\\n              \\\"targets\\\": [\\n                  {\\n                      \\\"os\\\": \\\"default\\\",\\n                      \\\"uri\\\": subscriptionUrl\\n                  }\\n              ]\\n          }\\n      ]\\n  };\\n  \\n  return {url, body};\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.prepareSendNotification.result",
+					"routes": [
+						"rest.1"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.prepareSendNotification.error",
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"rest.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-restclient/rest",
+			"name": "sendNotification",
+			"method": "post",
+			"parameters": [
+				{
+					"name": "body",
+					"type": "jsonpath",
+					"value": "$.prepareSendNotification.result.body",
+					"metaName": "Body",
+					"metaDescription": "The content to send."
+				},
+				{
+					"name": "url",
+					"type": "jsonpath",
+					"value": "$.prepareSendNotification.result.url",
+					"metaName": "URL",
+					"metaDescription": "The target URL."
+				}
+			],
+			"outputs": {
+				"2xx": {
+					"routes": [
+						"invoke-flow-response.2"
+					],
+					"context": "$.sendNotification.response",
+					"metaName": "2XX"
+				},
+				"3xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.sendNotification.response",
+					"metaName": "3XX"
+				},
+				"4xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.sendNotification.response",
+					"metaName": "4XX"
+				},
+				"5xx": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.sendNotification.response",
+					"metaName": "5XX"
+				},
+				"error": {
+					"routes": [
+						"invoke-flow-response.3"
+					],
+					"context": "$.sendNotification.response",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "POST"
+		},
+		"invoke-flow-response.3": {
+			"type": "nodehandler://@axway/api-builder-plugin-invoke-flow/invoke-flow-response",
+			"name": "Set Response",
+			"method": "setResponse",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "string",
+					"value": "\"Error\"",
+					"metaName": "Data",
+					"metaDescription": "The result to be returned to the flow that called `Invoke Flow`."
+				},
+				{
+					"name": "isError",
+					"type": "boolean",
+					"value": "true",
+					"metaName": "Is Error",
+					"metaDescription": "Indicates that the response is an error.  This will cause the `Invoke Flow` to trigger the `Error` output with this value."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Set Response"
+		},
+		"javascript.5": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "prepareUpdateSubscriptionRequest",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"let body = {\\n  \\t\\\"description\\\": \\\"Approved via Custom Subsription Flow\\\",\\n  \\t\\\"state\\\": \\\"APPROVED\\\"\\n  };\\n\\n  return {body};\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.prepareUpdateSubscriptionRequest.result",
+					"routes": [
+						"ucswagger.2"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.prepareUpdateSubscriptionRequest.error",
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"invoke-flow-response.4": {
+			"type": "nodehandler://@axway/api-builder-plugin-invoke-flow/invoke-flow-response",
+			"name": "Set Response",
+			"method": "setResponse",
+			"parameters": [
+				{
+					"name": "isError",
+					"type": "boolean",
+					"value": "true",
+					"metaName": "Is Error",
+					"metaDescription": "Indicates that the response is an error.  This will cause the `Invoke Flow` to trigger the `Error` output with this value."
+				},
+				{
+					"name": "data",
+					"type": "string",
+					"value": "\"Error\"",
+					"metaName": "Data",
+					"metaDescription": "The result to be returned to the flow that called `Invoke Flow`."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Set Response"
+		},
+		"ucswagger.2": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-swagger/ucswagger",
+			"name": "updateSubscriptionRequest",
+			"method": "POST_catalogItemSubscriptions",
+			"parameters": [
+				{
+					"name": "catalogItemId",
+					"type": "jsonpath",
+					"value": "$.getCatalogItem.response.data.id",
+					"metaName": "catalogItemId"
+				},
+				{
+					"name": "subscriptionId",
+					"type": "jsonpath",
+					"value": "$.request.id",
+					"metaName": "subscriptionId"
+				},
+				{
+					"name": "body",
+					"type": "jsonpath",
+					"value": "$.prepareUpdateSubscriptionRequest.result.body",
+					"metaName": "body",
+					"metaDescription": "The request body.  Please refer to the info icon for schema."
+				}
+			],
+			"outputs": {
+				"201": {
+					"routes": [
+						"javascript.7"
+					],
+					"context": "$.response",
+					"metaName": "201"
+				},
+				"400": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "400"
+				},
+				"401": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "401"
+				},
+				"403": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "403"
+				},
+				"404": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "404"
+				},
+				"500": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "500"
+				},
+				"error": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.error",
+					"metaName": "Error"
+				},
+				"default": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "Default"
+				}
+			},
+			"authorizations": [
+				{
+					"name": "OAuth2ClientCredentials",
+					"type": "credential",
+					"value": "Amplify Unified Catalog APIs OAuth2ClientCredentials_clientCredentials"
+				}
+			],
+			"metaMethod": "POST_catalogItemSubscriptions"
+		},
+		"javascript.6": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "prepareAddContactNote",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"let contactId = data.getContactByEmail.response.body.records[0].Id;\\n  let apicentralUrl = data.env.API_CENTRAL_URL ? data.env.API_CENTRAL_URL : 'https://apicentral.axway.com';\\n  let subscriptionUrl = apicentralUrl+'/catalog/'+data.request.catalogItemId+'/subscriptions/'+data.request.id;\\n  \\n  let url = 'https://'+data.env.SFDC_DOMAIN_NAME+'.my.salesforce.com'+'/services/data/v53.0/sobjects/Note';\\n  \\n  let message = 'Subscription request, \\\"'+data.request.name+'\\\" for API: '+data.getCatalogItem.response.data.name+' was approved via subscription flow. The subscription can be viewed here: \\\\n\\\\n'+subscriptionUrl;\\n  \\n  let body = {\\n    'ParentId': contactId,\\n    'Title': 'API Subscription request processed',\\n    'Body': message,\\n    'IsPrivate': false\\n  };\\n  \\n  let headers = {\\n    'Authorization': 'Bearer '+data.config.sfdcAccessToken\\n  };\\n      \\n  return {url, body, headers};\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.prepareAddContactNote.result",
+					"routes": [
+						"rest.4"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.prepareAddContactNote.error",
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"rest.4": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-restclient/rest",
+			"name": "addContactNote",
+			"method": "post",
+			"parameters": [
+				{
+					"name": "body",
+					"type": "jsonpath",
+					"value": "$.prepareAddContactNote.result.body",
+					"metaName": "Body",
+					"metaDescription": "The content to send."
+				},
+				{
+					"name": "url",
+					"type": "jsonpath",
+					"value": "$.prepareAddContactNote.result.url",
+					"metaName": "URL",
+					"metaDescription": "The target URL."
+				},
+				{
+					"name": "headers",
+					"type": "jsonpath",
+					"value": "$.prepareAddContactNote.result.headers",
+					"metaName": "Headers",
+					"metaDescription": "The HTTP headers to set."
+				}
+			],
+			"outputs": {
+				"2xx": {
+					"routes": [
+						"invoke-flow-response.1"
+					],
+					"context": "$.response",
+					"metaName": "2XX"
+				},
+				"3xx": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "3XX"
+				},
+				"4xx": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "4XX"
+				},
+				"5xx": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.response",
+					"metaName": "5XX"
+				},
+				"error": {
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"context": "$.error",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "POST"
+		},
+		"javascript.7": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "contactExists",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"return data.getContactByEmail.response.body.records.length>0;\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.contactExists.result",
+					"routes": [
+						"condition.2"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.contactExists.error",
+					"routes": [
+						"invoke-flow-response.4"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"condition.2": {
+			"type": "nodehandler://axway-flow/condition",
+			"name": "Equals",
+			"method": "equals",
+			"parameters": [
+				{
+					"name": "source",
+					"type": "jsonpath",
+					"value": "$.contactExists.result",
+					"metaName": "Source",
+					"metaDescription": "The input to test."
+				},
+				{
+					"name": "value",
+					"type": "boolean",
+					"value": "true",
+					"metaName": "Value",
+					"metaDescription": "The value to test input against."
+				}
+			],
+			"outputs": {
+				"true": {
+					"routes": [
+						"javascript.6"
+					],
+					"context": "$.equals",
+					"metaName": "True"
+				},
+				"false": {
+					"routes": [
+						"invoke-flow-response.1"
+					],
+					"context": "$.equals",
+					"metaName": "False"
+				}
+			},
+			"metaMethod": "Equals"
+		}
+	}
+}
