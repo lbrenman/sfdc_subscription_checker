@@ -3,13 +3,18 @@
 This API Builder project implements the Amplify Central Custom API Subscription Flow CRM Contact Exists Use Case described [here](https://blog.axway.com/developer/amplify-central-connected-gateway-custom-api-subscription-flow-with-crm-use-case).
 
 * There are two flows in the project:
-  * Approval Flow - Main flow that runs on a timer and retrieves a list of Subscription that are in the REQUEST state
+  * Approval Flow - Main flow that runs on a timer and retrieves a list of Subscription that are in the REQUEST state. I also retrieves a Salesforce token for API requests that are made in the next flow.
+
+  ![](https://i.imgur.com/eCcOPS8.png)
+
   * Subscriptions Checker - Flow that is invoked from the main flow in a loop over the list of subscriptions. It checks to see if the subscriber is in a whitelist or is a contact in Salesforce.
     * If the subscriber is part of the white list, then the subscription is approved
     * If the subscriber is in Salesforce, then the subscription is approved and a note is added to the contact
-    * If neither, then a notification is sent to MS Teams to alert the approval team as shown below. If the approval team adds the subscriber to Salesforce. Then on the next iteration of the main flow, the subscription will be approved and the agents will complete the approval process.
+    * If neither, then a notification is sent to MS Teams to alert the approval team. If the approval team adds the subscriber to Salesforce. Then on the next iteration of the main flow, the subscription will be approved and the agents will complete the approval process.
 
     ![](https://i.imgur.com/6p0OOc5.png)
+
+    ![](https://i.imgur.com/XWqvhu8.png)
 
 
 * Here are the major aspects of the flows:
