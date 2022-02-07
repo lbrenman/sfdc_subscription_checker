@@ -7,7 +7,9 @@ This API Builder project implements the Amplify Central Custom API Subscription 
   * Subscriptions Checker - Flow that is invoked from the main flow in a loop over the list of subscriptions. It checks to see if the subscriber is in a whitelist or is a contact in Salesforce.
     * If the subscriber is part of the white list, then the subscription is approved
     * If the subscriber is in Salesforce, then the subscription is approved and a note is added to the contact
-    * If neither, then a notification is sent to MS Teams to alert the approval team. If the approval team adds the subscriber to Salesforce. Then on the next iteration of the main flow, the subscription will be approved
+    * If neither, then a notification is sent to MS Teams to alert the approval team as shown below. If the approval team adds the subscriber to Salesforce. Then on the next iteration of the main flow, the subscription will be approved and the agents will complete the approval process.
+
+    ![](https://i.imgur.com/6p0OOc5.png)
 
 
 * Here are the major aspects of the flows:
